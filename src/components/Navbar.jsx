@@ -58,6 +58,8 @@ function Navbar() {
                         Profile
                         </p>
                     </li>
+
+                    {/* // To add outline for sign-in/up/forgot-pass: */}
                 </ul>
             </nav>
         </footer>
