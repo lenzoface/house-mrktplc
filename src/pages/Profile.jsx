@@ -89,7 +89,7 @@ function Profile() {
             className={!changeDetails ? 'profileEmail' : 'profileEmailActive'}
             // !!!! Won't change email because cant update it like that in the Firebase (for now)
             // disabled={!changeDetails} 
-            disabled='true'
+            disabled={true}
             value={email}
             onChange={onChange}
           />
