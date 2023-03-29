@@ -24,6 +24,26 @@ function SignUp() {
     }))
   }
 
+  const onSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const auth = getAuth()
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+
+      const user = userCredential.user
+
+      updateProfile(auth.currentUser, {
+        displayName: name
+      })
+
+      navigate('/')
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
       <div className="pageContainer">
@@ -31,7 +51,7 @@ function SignUp() {
           <p className="pageHeader">Sign Up!</p>
         </header>
 
-        <form className="">
+        <form onSubmit={onSubmit}>
           <input type="text" className="nameInput" placeholder="Name" value={name} id="name" onChange={onChange} />
 
           <input type="email" className="emailInput" placeholder="Email" value={email} id="email" onChange={onChange} />
