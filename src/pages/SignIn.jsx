@@ -32,6 +32,7 @@ function SignIn() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
   
       if (userCredential.user) {
+        toast.success('Welcome Back!')
         navigate('/')
       }
     } catch (error) {
