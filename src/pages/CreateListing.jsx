@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
+import { toast } from "react-toastify";
 
 function CreateListing() {
   // If it won't be true, then user can set lat/lon manually
@@ -53,35 +54,78 @@ function CreateListing() {
     });
   }, []);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    setLoading(true);
+
+    if (discountedPrice >= regularPrice) {
+      setLoading(false);
+      toast.error("Discounted price needs to be less than regular price!");
+      return;
+    }
+
+    if (images.length > 6) {
+      setLoading(false);
+      toast.error("Max 6 images!");
+      return;
+    }
+
+    let geolocation = {};
+    let location;
+
+    if (geolocationEnabled) {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${process.env.REACT_APP_MAPBOX_API_TOKEN}`
+      );
+
+      const data = await response.json();
+
+      const noData = data.features.length === 0;
+
+      geolocation.lat = noData ? 0 : data.features[0].center[1];
+      geolocation.lng = noData ? 0 : data.features[0].center[0];
+
+      location = noData ? undefined : data.features[0].place_name;
+
+      if (noData) {
+        setLoading(false);
+        toast.error("Please enter a correct address");
+        return;
+      }
+    } else {
+      geolocation.lat = latitude;
+      geolocation.lng = longitude;
+      location = address;
+    }
+
+    setLoading(false);
   };
 
   const onMutate = (e) => {
-    let boolean = null
+    let boolean = null;
 
-    if(e.target.value === 'true') {
-        boolean = true
+    if (e.target.value === "true") {
+      boolean = true;
     }
-    if(e.target.value === 'false') {
-        boolean = false
+    if (e.target.value === "false") {
+      boolean = false;
     }
 
     // Files
-    if(e.target.files) {
-        setFormData((prevState) => ({
-            ...prevState,
-            images: e.target.files
-        }))
+    if (e.target.files) {
+      setFormData((prevState) => ({
+        ...prevState,
+        images: e.target.files,
+      }));
     }
 
     // Text/Booleans/Numbers
     if (!e.target.files) {
-        setFormData((prevState) => ({
-            ...prevState,
-            [e.target.id]: boolean ?? e.target.value
-        }))
+      setFormData((prevState) => ({
+        ...prevState,
+        [e.target.id]: boolean ?? e.target.value,
+      }));
     }
   };
 
