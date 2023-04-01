@@ -163,7 +163,7 @@ function CreateListing() {
         ...formData,
         imgUrls,
         geolocation,
-        timesamp: serverTimestamp()
+        timestamp: serverTimestamp()
     }
 
     
