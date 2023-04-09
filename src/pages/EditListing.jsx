@@ -92,7 +92,7 @@ function EditListing() {
         navigate("/sign-in");
       }
     });
-  }, [auth, formData, navigate]);
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();

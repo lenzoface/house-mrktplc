@@ -62,7 +62,7 @@ function CreateListing() {
         navigate("/sign-in");
       }
     });
-  }, [auth, navigate, formData]);
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
