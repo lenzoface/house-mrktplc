@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getStorage,
@@ -15,6 +15,7 @@ import Spinner from "../components/Spinner";
 
 function CreateListing() {
   // If it won't be true, then user can set lat/lon manually
+  // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +62,7 @@ function CreateListing() {
         navigate("/sign-in");
       }
     });
-  }, []);
+  }, [auth, navigate, formData]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -96,8 +97,8 @@ function CreateListing() {
       geolocation.lat = noData ? 0 : data.features[0].center[1];
       geolocation.lng = noData ? 0 : data.features[0].center[0];
 
+      // eslint-disable-next-line
       location = noData ? undefined : data.features[0].place_name;
-
 
       if (noData) {
         setLoading(false);
@@ -126,6 +127,7 @@ function CreateListing() {
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            // eslint-disable-next-line
             console.log("Upload is " + progress + "% done");
             switch (snapshot.state) {
               case "paused":
@@ -133,6 +135,8 @@ function CreateListing() {
                 break;
               case "running":
                 console.log("Upload is running");
+                break;
+              default:
                 break;
             }
           },
@@ -160,23 +164,22 @@ function CreateListing() {
     });
 
     const formDataCopy = {
-        ...formData,
-        imgUrls,
-        geolocation,
-        timestamp: serverTimestamp()
-    }
+      ...formData,
+      imgUrls,
+      geolocation,
+      timestamp: serverTimestamp(),
+    };
 
-    
     formDataCopy.location = address;
-    delete formDataCopy.images
-    delete formDataCopy.address
+    delete formDataCopy.images;
+    delete formDataCopy.address;
     // location && (formDataCopy.location = location)
-    !formDataCopy.offer && delete formDataCopy.discountedPrice
+    !formDataCopy.offer && delete formDataCopy.discountedPrice;
 
-    const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
+    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
     setLoading(false);
-    toast.success('Listing saved')
-    navigate(`/category/${formDataCopy.type}/${docRef.id}`)
+    toast.success("Listing saved");
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
 
   const onMutate = (e) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getStorage,
@@ -6,12 +6,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import {
-  doc,
-  updateDoc,
-  getDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase.config";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -20,6 +15,7 @@ import Spinner from "../components/Spinner";
 
 function EditListing() {
   // If it won't be true, then user can set lat/lon manually
+  // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [listing, setListing] = useState(false);
@@ -62,11 +58,11 @@ function EditListing() {
 
   // Redirect if listing is not user's
   useEffect(() => {
-    if(listing && listing.userRef !== auth.currentUser.uid) {
-        toast.error("You can't edit that listing")
-        navigate('/')
+    if (listing && listing.userRef !== auth.currentUser.uid) {
+      toast.error("You can't edit that listing");
+      navigate("/");
     }
-  })
+  });
 
   // Fetch listing to edit
   useEffect(() => {
@@ -96,7 +92,7 @@ function EditListing() {
         navigate("/sign-in");
       }
     });
-  }, []);
+  }, [auth, formData, navigate]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -131,6 +127,7 @@ function EditListing() {
       geolocation.lat = noData ? 0 : data.features[0].center[1];
       geolocation.lng = noData ? 0 : data.features[0].center[0];
 
+      // eslint-disable-next-line
       location = noData ? undefined : data.features[0].place_name;
 
       if (noData) {
@@ -167,6 +164,8 @@ function EditListing() {
                 break;
               case "running":
                 console.log("Upload is running");
+                break;
+              default:
                 break;
             }
           },
@@ -208,8 +207,8 @@ function EditListing() {
 
     // const docRef = await addDoc(collection(db, "listings"), formDataCopy);
     // Update listing
-    const docRef = doc(db, 'listings', params.listingId)
-    await updateDoc(docRef, formDataCopy)
+    const docRef = doc(db, "listings", params.listingId);
+    await updateDoc(docRef, formDataCopy);
     setLoading(false);
     toast.success("Listing saved");
     navigate(`/category/${formDataCopy.type}/${docRef.id}`);
